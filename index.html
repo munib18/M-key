@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Model Viewer</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <!-- Include Three.js and STLLoader via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/STLLoader.js"></script>
+
+    <script>
+        // Set up the basic Three.js scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add lighting for better 3D effect
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(1, 1, 1).normalize();
+        scene.add(light);
+
+        // Load the STL model
+        const loader = new THREE.STLLoader();
+        loader.load('M.stl', function (geometry) {
+            const material = new THREE.MeshPhongMaterial({ color: 0x0077ff });
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            // Position and scale the model as needed
+            mesh.position.set(0, 0, 0);
+            mesh.rotation.set(-Math.PI / 2, 0, 0);
+            mesh.scale.set(0.1, 0.1, 0.1); // Adjust scale as necessary
+
+            camera.position.z = 10;
+
+            // Animation loop to render the scene
+            function animate() {
+                requestAnimationFrame(animate);
+                mesh.rotation.z += 0.01; // Rotate slowly for effect
+                renderer.render(scene, camera);
+            }
+            animate();
+        });
+
+        // Adjust the canvas size on window resize
+        window.addEventListener('resize', function () {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>
