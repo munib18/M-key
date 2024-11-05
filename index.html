@@ -10,9 +10,10 @@
     </style>
 </head>
 <body>
-    <!-- Include Three.js and STLLoader via CDN -->
+    <!-- Include Three.js, STLLoader, and OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/STLLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/controls/OrbitControls.js"></script>
 
     <script>
         // Set up the basic Three.js scene
@@ -22,10 +23,16 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Add lighting for better 3D effect
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(1, 1, 1).normalize();
-        scene.add(light);
+        // Add orbit controls for user interactivity
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // Lighting for a better 3D effect
+        const ambientLight = new THREE.AmbientLight(0x404040, 2); // Soft light
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(10, 10, 10).normalize();
+        scene.add(directionalLight);
 
         // Load the STL model
         const loader = new THREE.STLLoader();
@@ -34,23 +41,24 @@
             const mesh = new THREE.Mesh(geometry, material);
             scene.add(mesh);
 
-            // Position and scale the model as needed
-            mesh.position.set(0, 0, 0);
-            mesh.rotation.set(-Math.PI / 2, 0, 0);
-            mesh.scale.set(0.1, 0.1, 0.1); // Adjust scale as necessary
+            // Center and scale the model
+            mesh.geometry.center();
+            mesh.scale.set(0.05, 0.05, 0.05); // Adjust scale if necessary
 
-            camera.position.z = 10;
-
-            // Animation loop to render the scene
-            function animate() {
-                requestAnimationFrame(animate);
-                mesh.rotation.z += 0.01; // Rotate slowly for effect
-                renderer.render(scene, camera);
-            }
-            animate();
+            // Set initial camera position for better view
+            camera.position.set(30, 30, 30);
+            controls.update();
         });
 
-        // Adjust the canvas size on window resize
+        // Animation loop to render the scene
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update(); // Update controls in each frame
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Adjust for window resizing
         window.addEventListener('resize', function () {
             renderer.setSize(window.innerWidth, window.innerHeight);
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -59,3 +67,4 @@
     </script>
 </body>
 </html>
+
